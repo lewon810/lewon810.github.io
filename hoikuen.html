@@ -524,11 +524,14 @@
             } else {
                 // Show Question
                 const step = quizSteps[stepIndex];
+                // Fix: Ensure string arguments like "GO" are quoted in the onclick handler
+                const noArg = typeof step.no === 'string' ? `'${step.no}'` : step.no;
+
                 container.innerHTML = `
                     <h4 class="text-lg font-bold text-gray-800 mb-6">${step.q}</h4>
                     <div class="flex gap-4 w-full px-4">
                         <button onclick="renderQuiz('${step.yes}')" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition">はい</button>
-                        <button onclick="renderQuiz(${step.no})" class="flex-1 py-3 rounded-xl bg-teal-500 text-white font-bold hover:bg-teal-600 shadow-md transition">いいえ</button>
+                        <button onclick="renderQuiz(${noArg})" class="flex-1 py-3 rounded-xl bg-teal-500 text-white font-bold hover:bg-teal-600 shadow-md transition">いいえ</button>
                     </div>
                     <div class="mt-4 text-xs text-gray-400">質問 ${stepIndex + 1} / ${quizSteps.length}</div>
                 `;
