@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>栄光熱海中央保育園 | 入園準備ガイド</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chosen Palette: "Warm Nursery"
+         Background: Orange-50 (Warm Neutral)
+         Primary: Orange-500/600 (Friendly, Active)
+         Secondary: Teal-500 (Calm, Health)
+         Accent: Yellow-400 (Highlight)
+         Text: Gray-700 (Readability)
+    -->
+
+    <!-- Application Structure Plan:
+         1. Hero Section: Welcome & Philosophy. Sets the emotional tone.
+         2. Action Center (To-Do List): High priority. Interactive checklist with progress bar.
+         3. Class Preparation Assistant: Filterable supply list to reduce cognitive load.
+         4. Daily Life Dashboard: Visualizes schedule and specific operating hours/fees via Chart.js.
+         5. Health Check Tool: Interactive "Can I go to school?" logic tree.
+         6. Admin & Food: Fee breakdown and dietary info in clear cards.
+    -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #FFF7ED; /* orange-50 */
+            color: #374151; /* gray-700 */
+        }
+
+        /* Chart Container Strict Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Restrict max width for readability */
+            height: 300px;   /* Default height */
+            margin: 0 auto;  /* Center horizontally */
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px; /* Taller on desktop */
+            }
+        }
+
+        /* Interactive Element Transitions */
+        .btn-class {
+            transition: all 0.2s ease;
+        }
+        .btn-class.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Checkbox Animation */
+        .check-circle {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="leading-relaxed">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <span class="text-2xl">📛</span>
+                    <div>
+                        <h1 class="font-bold text-gray-800 leading-none">栄光熱海中央保育園</h1>
+                        <span class="text-xs text-orange-500 font-bold">入園準備ガイド</span>
+                    </div>
+                </div>
+                <div class="flex space-x-1 sm:space-x-4 text-xs sm:text-sm font-bold text-gray-600">
+                    <a href="#todo" class="px-3 py-2 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition">準備リスト</a>
+                    <a href="#supplies" class="px-3 py-2 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition">持ち物</a>
+                    <a href="#schedule" class="px-3 py-2 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition">時間と料金</a>
+                    <a href="#health" class="px-3 py-2 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition">健康</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-16">
+
+        <!-- 1. Hero Section -->
+        <section class="text-center space-y-6 animate-fade-in-up">
+            <div class="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-bold mb-2">
+                🌸 ご入園おめでとうございます
+            </div>
+            <h2 class="text-3xl sm:text-5xl font-bold text-gray-800 tracking-tight">
+                安心で楽しい<br><span class="text-orange-500">園生活</span>のスタートへ
+            </h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                このガイドは、入園のしおりの重要事項をまとめたものです。<br>
+                毎日の持ち物チェックや、登園前の健康確認にご活用ください。
+            </p>
+
+            <!-- Philosophy Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left mt-8">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-orange-100 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">🌱</div>
+                    <h3 class="font-bold text-gray-800">法人理念</h3>
+                    <p class="text-sm text-gray-500 mt-1">「大いなる育みと未来創造」</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-orange-100 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">💎</div>
+                    <h3 class="font-bold text-gray-800">保育理念</h3>
+                    <p class="text-sm text-gray-500 mt-1">「次代を担う子どもは未来の宝」</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-orange-100 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">☀️</div>
+                    <h3 class="font-bold text-gray-800">保育目標</h3>
+                    <p class="text-sm text-gray-500 mt-1">「明るく、強く、のびのびとした豊かな人格形成」</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Action Center (To-Do List) -->
+        <!-- Goal: Organize tasks. Interaction: Checklist with local storage persistence. -->
+        <section id="todo" class="scroll-mt-24">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-lg border border-orange-100">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <span>✅</span> 入園準備 To-Do
+                        </h3>
+                        <p class="text-sm text-gray-500 mt-1">準備の進捗を管理しましょう（ブラウザに保存されます）</p>
+                    </div>
+                    <div class="mt-4 sm:mt-0 bg-orange-50 px-4 py-2 rounded-full">
+                        <span id="progress-text" class="font-bold text-orange-600 text-lg">0%</span>
+                        <span class="text-xs text-orange-400 font-bold ml-1">完了</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-100 rounded-full h-3 mb-8 overflow-hidden">
+                    <div id="progress-bar" class="bg-orange-500 h-3 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="todo-list">
+                    <!-- JS Injected Items -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Class Preparation Assistant -->
+        <!-- Goal: Inform & Organize. Interaction: Filter matrix data by age group. -->
+        <section id="supplies" class="scroll-mt-24 space-y-6">
+            <div class="text-center">
+                <h3 class="text-2xl font-bold text-gray-800">🎒 クラス別 持ち物ガイド</h3>
+                <p class="text-gray-600 mt-2">お子様の年齢クラスをタップしてください</p>
+            </div>
+
+            <!-- Class Selector Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <button class="btn-class px-4 py-2 rounded-full border-2 border-pink-200 text-pink-700 font-bold bg-white hover:bg-pink-50" onclick="updateSupplies('0')">0歳 もも</button>
+                <button class="btn-class px-4 py-2 rounded-full border-2 border-yellow-200 text-yellow-700 font-bold bg-white hover:bg-yellow-50" onclick="updateSupplies('1')">1歳 たんぽぽ</button>
+                <button class="btn-class px-4 py-2 rounded-full border-2 border-red-200 text-red-700 font-bold bg-white hover:bg-red-50" onclick="updateSupplies('2')">2歳 ちゅうりっぷ</button>
+                <button class="btn-class px-4 py-2 rounded-full border-2 border-purple-200 text-purple-700 font-bold bg-white hover:bg-purple-50" onclick="updateSupplies('3')">3歳 ばら</button>
+                <button class="btn-class px-4 py-2 rounded-full border-2 border-blue-200 text-blue-700 font-bold bg-white hover:bg-blue-50" onclick="updateSupplies('4')">4歳 ひまわり</button>
+                <button class="btn-class px-4 py-2 rounded-full border-2 border-green-200 text-green-700 font-bold bg-white hover:bg-green-50" onclick="updateSupplies('5')">5歳 さくら</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Dynamic List -->
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <h4 id="class-title" class="text-xl font-bold text-gray-800">クラスを選択してください</h4>
+                        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">数字は最低必要枚数</span>
+                    </div>
+                    <div id="supply-list-container" class="space-y-3">
+                        <!-- Items go here -->
+                        <p class="text-center text-gray-400 py-8">👆 上のボタンからクラスを選んでください</p>
+                    </div>
+                </div>
+
+                <!-- Static Rules (Naming & Forbidden) -->
+                <div class="space-y-4">
+                    <div class="bg-red-50 p-6 rounded-3xl border border-red-100">
+                        <h4 class="font-bold text-red-600 mb-3 flex items-center gap-2">⚠️ 禁止・NGアイテム</h4>
+                        <ul class="text-sm space-y-2 text-red-800">
+                            <li class="flex gap-2"><span class="shrink-0">❌</span><span><strong>髪飾り禁止</strong><br>ピン、カチューシャ、小ゴム（誤飲防止）</span></li>
+                            <li class="flex gap-2"><span class="shrink-0">❌</span><span><strong>フード・紐付きの服</strong><br>遊具事故防止のため</span></li>
+                            <li class="flex gap-2"><span class="shrink-0">❌</span><span><strong>華美なキーホルダー</strong><br>破損・トラブル防止</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100">
+                        <h4 class="font-bold text-blue-600 mb-3 flex items-center gap-2">🖊️ 名前書きルール</h4>
+                        <ul class="text-sm space-y-2 text-blue-800">
+                            <li><strong>オムツ:</strong> 1枚ずつ後ろに</li>
+                            <li><strong>布団:</strong> 二つ折りの横中央に大きく</li>
+                            <li><strong>靴下:</strong> 足裏の滑り止めや内側に</li>
+                            <li><strong>基本:</strong> 全てにフルネームで！</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Daily Life Dashboard (Schedule & Costs) -->
+        <!-- Goal: Compare time slots & Inform regarding fees. Visualization: Chart.js Stacked Bar. -->
+        <section id="schedule" class="scroll-mt-24">
+            <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-lg border border-gray-100">
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                        <span>⏰</span> 時間と料金のしくみ
+                    </h3>
+                    <p class="text-gray-600 text-sm mt-1">「標準時間」と「短時間」で利用できる時間が異なります。</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    
+                    <!-- Chart Section -->
+                    <div>
+                        <div class="bg-gray-50 rounded-2xl p-4 mb-4">
+                            <h4 class="font-bold text-gray-700 text-center mb-2">保育時間認定区分</h4>
+                            <div class="chart-container">
+                                <canvas id="timeChart"></canvas>
+                            </div>
+                            <div class="mt-4 flex justify-center gap-4 text-xs font-bold">
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-400"></span>保育時間</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-400"></span>延長(有料)</span>
+                            </div>
+                        </div>
+
+                        <!-- Fees Card -->
+                        <div class="bg-orange-50 rounded-2xl p-5 border border-orange-100">
+                            <h4 class="font-bold text-orange-800 mb-3 flex items-center gap-2">💰 諸費用メモ</h4>
+                            <div class="space-y-3 text-sm text-gray-700">
+                                <div class="flex justify-between border-b border-orange-200 pb-2">
+                                    <span>延長保育料</span>
+                                    <span class="font-bold">500円 / 30分</span>
+                                </div>
+                                <div class="flex justify-between border-b border-orange-200 pb-2">
+                                    <span>主食費 (3歳以上)</span>
+                                    <span class="font-bold">1,000円 / 月</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>副食費 (3歳以上)</span>
+                                    <span class="font-bold">5,000円 / 月</span>
+                                </div>
+                                <p class="text-xs text-orange-600 mt-2">※18:00以降は補食が出ます。お迎えが遅れる場合は必ず連絡を！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Section -->
+                    <div class="relative pl-4">
+                        <h4 class="font-bold text-gray-800 mb-6 text-lg">一日のながれ</h4>
+                        <div class="absolute left-4 top-12 bottom-0 w-0.5 bg-gray-200"></div>
+                        
+                        <div class="space-y-8 relative">
+                            <!-- Item -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0 z-10 border-2 border-white shadow-sm">07</div>
+                                <div>
+                                    <span class="text-xs font-bold text-orange-500">7:00</span>
+                                    <h5 class="font-bold text-gray-800">開園・順次登園</h5>
+                                    <p class="text-sm text-gray-500">視診・検温・合同保育</p>
+                                </div>
+                            </div>
+                            <!-- Item -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0 z-10 border-2 border-white shadow-sm">09</div>
+                                <div>
+                                    <span class="text-xs font-bold text-orange-500">9:30</span>
+                                    <h5 class="font-bold text-gray-800">おやつ（乳児）</h5>
+                                    <p class="text-sm text-gray-500">牛乳などを飲みます</p>
+                                </div>
+                            </div>
+                            <!-- Item -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0 z-10 border-2 border-white shadow-sm">10</div>
+                                <div>
+                                    <span class="text-xs font-bold text-orange-500">10:00</span>
+                                    <h5 class="font-bold text-gray-800">設定保育・お散歩</h5>
+                                    <p class="text-sm text-gray-500">製作、リズム遊び、戸外遊び</p>
+                                </div>
+                            </div>
+                            <!-- Item -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0 z-10 border-2 border-white shadow-sm">11</div>
+                                <div>
+                                    <span class="text-xs font-bold text-orange-500">11:00 ~</span>
+                                    <h5 class="font-bold text-gray-800">給食・お昼寝</h5>
+                                    <p class="text-sm text-gray-500">年齢に応じて順次食事。12:00頃からお昼寝。</p>
+                                </div>
+                            </div>
+                            <!-- Item -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0 z-10 border-2 border-white shadow-sm">15</div>
+                                <div>
+                                    <span class="text-xs font-bold text-orange-500">15:00</span>
+                                    <h5 class="font-bold text-gray-800">目覚め・おやつ</h5>
+                                    <p class="text-sm text-gray-500">検温後、おやつを食べます。</p>
+                                </div>
+                            </div>
+                            <!-- Item -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0 z-10 border-2 border-white shadow-sm">16</div>
+                                <div>
+                                    <span class="text-xs font-bold text-orange-500">16:00 ~</span>
+                                    <h5 class="font-bold text-gray-800">順次降園</h5>
+                                    <p class="text-sm text-gray-500">18:00から延長保育（補食あり）。20:00閉園。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Health Check Tool -->
+        <!-- Goal: Decision Support. Interaction: Interactive Branching Logic. -->
+        <section id="health" class="scroll-mt-24">
+            <div class="bg-gradient-to-br from-teal-50 to-green-50 rounded-3xl p-6 sm:p-10 shadow-sm border border-teal-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold text-teal-800 mb-4 flex items-center gap-2">
+                            <span>🏥</span> 登園判断チェッカー
+                        </h3>
+                        <p class="text-teal-700 mb-6">
+                            「今日、保育園に行けるかな？」と迷った時に確認してください。<br>
+                            質問に答えるだけで、園のルールに基づいた判断ができます。
+                        </p>
+                        
+                        <!-- Quiz Interface -->
+                        <div id="quiz-container" class="bg-white rounded-2xl p-6 shadow-md min-h-[220px] flex flex-col justify-center items-center text-center transition-all">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Health Rules Static Info -->
+                    <div class="bg-white/60 p-6 rounded-2xl text-sm text-teal-900 space-y-4 backdrop-blur-sm">
+                        <h4 class="font-bold border-b border-teal-200 pb-2 text-lg">重要なお約束</h4>
+                        <div>
+                            <span class="font-bold block text-teal-700">💊 お薬について</span>
+                            原則預かりません。慢性疾患など医師の指示がある場合のみ「薬連絡票」と「処方薬（1回分）」で対応可。市販薬は不可。
+                        </div>
+                        <div>
+                            <span class="font-bold block text-teal-700">🦠 感染症</span>
+                            インフルエンザ等は医師の「登園許可」が出るまでお休みです。解熱後24時間経過が必要です。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Food Info -->
+        <section class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>🍱</span> 給食・食育について
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-yellow-50 p-5 rounded-2xl border border-yellow-100">
+                    <h4 class="font-bold text-yellow-800 mb-2">🍽️ 初めての食材ルール</h4>
+                    <p class="text-sm text-gray-700 mb-2">
+                        アレルギー事故防止のため、園で初めて食べる食材がないようにご協力をお願いします。
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 font-bold bg-white p-3 rounded-lg">
+                        <li>初めての食材は自宅で試す</li>
+                        <li>平日の午前中に試す（病院に行ける時間）</li>
+                        <li>「食材チェック表」を提出する</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-700 mb-2">離乳食の進み方（目安）</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center gap-2"><span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold">初期 (5-6ヶ月)</span> つぶし粥、野菜ペースト</li>
+                        <li class="flex items-center gap-2"><span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold">中期 (7-8ヶ月)</span> ツナ、全卵、鶏肉</li>
+                        <li class="flex items-center gap-2"><span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold">後期 (9-11ヶ月)</span> 豚肉、チーズ</li>
+                        <li class="flex items-center gap-2"><span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold">完了期 (12-18ヶ月)</span> 牛乳、カレー、ごぼう</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-orange-100 py-10 mt-12 text-center">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="font-bold text-orange-800 text-lg mb-2">栄光熱海中央保育園</h2>
+            <p class="text-orange-600 text-sm mb-4">社会福祉法人 栄光会</p>
+            <p class="text-xs text-orange-500">
+                ※このデジタルガイドは、配布された入園のしおり等の資料を基に作成された要約版です。<br>
+                詳細な規定や最新情報は、必ず原本資料または園からの連絡をご確認ください。
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 1. TO-DO LIST LOGIC ---
+        const todoItems = [
+            { id: "doc1", text: "就労証明書等の提出", cat: "書類" },
+            { id: "doc2", text: "児童票・家庭状況調査票", cat: "書類" },
+            { id: "doc3", text: "健康診断書 (入園前健診)", cat: "書類" },
+            { id: "doc4", text: "食材チェック表の確認", cat: "書類" },
+            { id: "doc5", text: "同意書の署名", cat: "書類" },
+            { id: "buy1", text: "布団セット (敷・掛・カバー・袋)", cat: "購入" },
+            { id: "buy2", text: "通園バッグ・おたより袋", cat: "購入" },
+            { id: "buy3", text: "衣類・下着 (多めに!)", cat: "購入" },
+            { id: "buy4", text: "防災頭巾", cat: "購入" },
+            { id: "name1", text: "全持ち物にフルネーム記名", cat: "記名" },
+            { id: "name2", text: "オムツ1枚ずつに記名", cat: "記名" },
+            { id: "name3", text: "布団の「横中央」に記名", cat: "記名" },
+            { id: "hab1", text: "早寝早起きの習慣づけ", cat: "習慣" },
+            { id: "hab2", text: "朝食をしっかり食べる", cat: "習慣" },
+        ];
+
+        function initTodo() {
+            const container = document.getElementById('todo-list');
+            const saved = JSON.parse(localStorage.getItem('nursery_todo') || '{}');
+            
+            // Build HTML
+            container.innerHTML = todoItems.map(item => {
+                const isChecked = saved[item.id];
+                return `
+                    <div onclick="toggleTodo('${item.id}')" 
+                         class="cursor-pointer p-3 rounded-xl border transition-all flex items-center gap-3 group ${isChecked ? 'bg-green-50 border-green-200' : 'bg-white border-gray-100 hover:border-orange-200 hover:shadow-sm'}">
+                        <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 check-circle ${isChecked ? 'bg-green-500 border-green-500' : 'border-gray-300 group-hover:border-orange-300'}">
+                            <span class="text-white text-sm font-bold ${isChecked ? 'block' : 'hidden'}">✓</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider ${isChecked ? 'text-green-600' : 'text-orange-400'}">${item.cat}</span>
+                            <div class="font-bold text-sm sm:text-base ${isChecked ? 'text-gray-400 line-through' : 'text-gray-700'}">${item.text}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update Stats
+            const total = todoItems.length;
+            const done = Object.values(saved).filter(v => v).length;
+            const percent = Math.round((done / total) * 100);
+            
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText = `${percent}%`;
+        }
+
+        function toggleTodo(id) {
+            const saved = JSON.parse(localStorage.getItem('nursery_todo') || '{}');
+            saved[id] = !saved[id];
+            localStorage.setItem('nursery_todo', JSON.stringify(saved));
+            initTodo(); // Re-render
+        }
+
+        // --- 2. CLASS SUPPLY LOGIC ---
+        const supplies = {
+            '0': { name: "0歳児 (もも)", items: ["上着 4枚 (着脱しやすい物)", "ズボン 4枚 (ゴム)", "肌着 4枚 (ロンパース可)", "靴下 2足", "洗濯袋", "コップのみ", "オムツ 5-8枚", "お尻敷きタオル 1枚", "口拭きナップ"] },
+            '1': { name: "1歳児 (たんぽぽ)", items: ["上着 3枚", "ズボン 3枚", "肌着 2枚 (ロンパース不可)", "パンツ △(トイトレ時)", "靴下 2足", "洗濯袋", "外靴・靴袋", "コップのみ", "オムツ 4-6枚", "お尻敷きタオル"] },
+            '2': { name: "2歳児 (ちゅうりっぷ)", items: ["上着 2枚~", "ズボン 2枚~", "肌着 2枚~", "パンツ 4枚~", "靴下 2足", "洗濯袋", "上履き・袋", "外靴", "コップのみ", "スモック", "オムツ 1-3枚"] },
+            '3': { name: "3歳児 (ばら)", items: ["上着 2枚~", "ズボン 2枚~", "肌着 2枚~", "パンツ 2枚~", "靴下 2足~", "洗濯袋", "替え靴・袋", "上履き・袋", "コップ・歯ブラシ", "スモック", "通園かばん (リュック等)"] },
+            '4': { name: "4歳児 (ひまわり)", items: ["上着 2枚~", "ズボン 2枚~", "肌着 2枚~", "パンツ 2枚~", "靴下 2枚~", "洗濯袋", "替え靴・袋", "上履き・袋", "コップ・歯ブラシ", "スモック", "通園かばん"] },
+            '5': { name: "5歳児 (さくら)", items: ["上着 2枚~", "ズボン 2枚~", "肌着 2枚~", "パンツ 2枚~", "靴下 2枚~", "洗濯袋", "替え靴・袋", "上履き・袋", "コップ・歯ブラシ", "スモック", "通園かばん"] }
+        };
+
+        function updateSupplies(id) {
+            // Update UI State
+            document.querySelectorAll('.btn-class').forEach(b => {
+                b.classList.remove('active', 'ring-2', 'ring-orange-300');
+                if(b.innerText.includes(supplies[id].name.split(' ')[1])) { // Simple match logic
+                   // b.classList.add('active', 'ring-2', 'ring-orange-300'); 
+                   // Logic simplified for onclick trigger, styling handled via re-render or class toggle usually
+                }
+            });
+            event.target.classList.add('active', 'ring-2', 'ring-orange-300'); // Highlight clicked
+
+            // Render Content
+            const data = supplies[id];
+            document.getElementById('class-title').innerText = `${data.name} の準備品`;
+            
+            const html = data.items.map(item => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <span class="font-bold text-gray-700">${item.split(' ')[0]}</span>
+                    <span class="text-sm bg-white px-2 py-1 rounded text-orange-600 font-bold shadow-sm">${item.split(' ').slice(1).join(' ') || '〇'}</span>
+                </div>
+            `).join('');
+            document.getElementById('supply-list-container').innerHTML = html;
+        }
+
+        // --- 3. HEALTH QUIZ LOGIC ---
+        const quizSteps = [
+            { q: "お子様の体温は 37.5℃ 以上ありますか？", yes: "STOP_FEVER", no: 1 },
+            { q: "24時間以内に「解熱剤」を使用しましたか？", yes: "STOP_MED", no: 2 },
+            { q: "24時間以内に、2回以上の嘔吐または水様便がありましたか？", yes: "STOP_INF", no: 3 },
+            { q: "食欲がなく、機嫌が悪い、またはぐったりしていますか？", yes: "STOP_GEN", no: "GO" }
+        ];
+
+        const quizResults = {
+            STOP_FEVER: { icon: "🤒", title: "登園できません", text: "37.5℃以上の発熱がある場合はお預かりできません。お家でゆっくり休みましょう。", color: "red" },
+            STOP_MED: { icon: "💊", title: "登園できません", text: "解熱剤使用後24時間は、熱が下がっていても登園できません。", color: "red" },
+            STOP_INF: { icon: "🤢", title: "登園できません", text: "感染症の疑いがあります。嘔吐・下痢が治まるまで様子を見てください。", color: "red" },
+            STOP_GEN: { icon: "🛌", title: "様子を見ましょう", text: "熱がなくても体調不良のサインです。無理な登園は控えましょう。", color: "yellow" },
+            GO: { icon: "🎒", title: "登園OK！", text: "元気に行ってらっしゃい！", color: "green" }
+        };
+
+        function renderQuiz(stepIndex) {
+            const container = document.getElementById('quiz-container');
+            
+            if (typeof stepIndex === 'string') {
+                // Show Result
+                const res = quizResults[stepIndex];
+                const bg = res.color === 'red' ? 'bg-red-50 text-red-800' : (res.color === 'yellow' ? 'bg-yellow-50 text-yellow-800' : 'bg-green-50 text-green-800');
+                container.innerHTML = `
+                    <div class="animate-bounce text-5xl mb-3">${res.icon}</div>
+                    <h4 class="text-xl font-bold mb-2 ${res.color === 'green' ? 'text-green-600' : (res.color === 'red' ? 'text-red-600' : 'text-yellow-600')}">${res.title}</h4>
+                    <p class="text-sm mb-4 max-w-xs mx-auto">${res.text}</p>
+                    <button onclick="renderQuiz(0)" class="text-xs underline text-gray-400 hover:text-gray-600">最初に戻る</button>
+                `;
+            } else {
+                // Show Question
+                const step = quizSteps[stepIndex];
+                container.innerHTML = `
+                    <h4 class="text-lg font-bold text-gray-800 mb-6">${step.q}</h4>
+                    <div class="flex gap-4 w-full px-4">
+                        <button onclick="renderQuiz('${step.yes}')" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition">はい</button>
+                        <button onclick="renderQuiz(${step.no})" class="flex-1 py-3 rounded-xl bg-teal-500 text-white font-bold hover:bg-teal-600 shadow-md transition">いいえ</button>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-400">質問 ${stepIndex + 1} / ${quizSteps.length}</div>
+                `;
+            }
+        }
+
+        // --- 4. CHARTS ---
+        function initCharts() {
+            const ctx = document.getElementById('timeChart').getContext('2d');
+            
+            // Data Structure representing hours on a timeline
+            // Dataset 1: Early Extension (Paid for Short)
+            // Dataset 2: Core Time
+            // Dataset 3: Evening Extension (Paid)
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['標準時間認定', '短時間認定'],
+                    datasets: [
+                        {
+                            label: '早朝(延長)',
+                            data: [0, 1.5], // Short pays for 7:00-8:30
+                            backgroundColor: '#FCA5A5', // Red-300
+                            stack: 'Stack 0',
+                        },
+                        {
+                            label: '保育時間',
+                            data: [11, 8], // 11h vs 8h
+                            backgroundColor: ['#34D399', '#60A5FA'], // Green-400, Blue-400
+                            stack: 'Stack 0',
+                        },
+                        {
+                            label: '夕方(延長)',
+                            data: [2, 3.5], // 18-20 vs 16:30-20
+                            backgroundColor: '#F87171', // Red-400
+                            stack: 'Stack 0',
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}時間`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true, max: 15, display: false },
+                        y: { stacked: true, grid: {display: false} }
+                    }
+                }
+            });
+        }
+
+        // Initialize All
+        document.addEventListener('DOMContentLoaded', () => {
+            initTodo();
+            updateSupplies('0'); // Default to 0 age
+            renderQuiz(0);
+            initCharts();
+        });
+
+    </script>
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</body>
+</html>
+```
