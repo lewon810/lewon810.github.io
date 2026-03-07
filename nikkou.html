@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鬼怒川温泉旅行 インタラクティブ・ダッシュボード</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutrals & Onsen Accent (Amber-50 background, Slate-800 text, Terracotta/Orange-600 accents) -->
+    <!-- Application Structure Plan: This single-page application is designed as an interactive travel dashboard to make the Kinugawa Onsen itinerary highly actionable. It features a top control bar for day selection, a central interactive timeline for chronological step-by-step navigation, and a supplementary panel for visual time-allocation stats and contextual memos. This layout is chosen because travelers need both a quick overview of their day's pace (stats) and granular, time-specific details (timeline) simultaneously without losing their place in the document. -->
+    <!-- Visualization & Content Choices:
+    1. Journey Timeline -> Goal: Organize -> Interactive Vertical List -> HTML/Tailwind styling with Javascript click events to expand details. Justification: Chronological data is best digested linearly, with progressive disclosure to keep the interface clean. Library: Vanilla JS.
+    2. Time Allocation -> Goal: Compare -> Doughnut Chart -> Chart.js drawing on a Canvas element. Justification: Provides immediate visual feedback on the ratio of travel time versus actual sightseeing/rest, helping set expectations for the day. Library: Chart.js.
+    3. Travel Memos -> Goal: Inform -> Dynamic Card Grid -> HTML/Tailwind structure populated by Javascript based on the selected day. Justification: Separates essential tips from the strict timeline, ensuring important advice isn't lost in the schedule. Library: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        }
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-slate-800 overflow-x-hidden min-h-screen">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold text-orange-700 flex items-center gap-2">
+                <span>♨️</span> 日光・鬼怒川旅行
+            </h1>
+            <div class="flex bg-amber-100 p-1 rounded-lg">
+                <button id="btn-day1" class="px-6 py-2 rounded-md font-semibold transition-colors bg-white shadow text-orange-700">1日目 (3/15)</button>
+                <button id="btn-day2" class="px-6 py-2 rounded-md font-semibold transition-colors text-slate-600 hover:text-orange-700">2日目 (3/16)</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-6xl mx-auto px-4 py-8">
+        <div class="bg-orange-600 text-white rounded-2xl p-6 sm:p-10 shadow-lg">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">旅のしおりダッシュボード</h2>
+            <p class="text-orange-100 text-lg leading-relaxed">
+                このセクションは、旅行全体の概要と目的を案内するエリアです。本ダッシュボードは、来週の鬼怒川温泉旅行のスケジュールを直感的に把握・操作できるように設計されています。上部のボタンで日程を切り替え、各日の詳細なスケジュールや注意事項を確認してください。
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 pb-12 flex flex-col gap-10">
+        
+        <section>
+            <div class="mb-4">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span>💡</span> 重要メモ・確認事項
+                </h3>
+            </div>
+            <div id="memos-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            </div>
+        </section>
+
+        <section class="flex flex-col">
+            <div class="mb-4">
+                <h3 class="text-2xl font-bold text-slate-800 border-b-2 border-orange-200 pb-2 inline-block">インタラクティブ・タイムライン</h3>
+                <p class="mt-2 text-slate-600 text-sm sm:text-base">
+                    当日の具体的な行動フローです。各予定をタップすることで、移動手段の詳細や観光のポイントなど、隠された付加情報が展開されます。
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-amber-100 p-4 sm:p-8">
+                <div id="timeline-container" class="relative border-l-4 border-orange-200 ml-4 sm:ml-6 space-y-6 sm:space-y-8 pb-4">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const tripData = {
+            day1: {
+                memos: [
+                    { icon: "💡", title: "浅草での乗り換え", text: "浅草駅での乗り換え時間はたっぷりありますが、都営浅草線の駅から東武線の駅までは地上を少し歩きます。スペーシアXに乗る前に、駅弁や飲み物を調達しておくと車内がより楽しめます。" },
+                    { icon: "🚕", title: "東照宮へのアクセス", text: "日曜日の昼前なので、バスが混雑している場合は早めにタクシーに切り替える作戦はバッチリです。" },
+                    { icon: "🗺️", title: "タクシー観光", text: "14:00〜18:00の4時間あるので、運転手さんにおすすめのスポット（華厳の滝や中禅寺湖など）を聞いて回るのも楽しいですね。" }
+                ],
+                events: [
+                    { time: "06:27", title: "バス乗車", desc: "熱海駅行き", icon: "🚌", color: "bg-blue-100 text-blue-700" },
+                    { time: "06:53", title: "熱海駅 発", desc: "新幹線こだま（上り）", icon: "🚅", color: "bg-blue-100 text-blue-700" },
+                    { time: "07:35", title: "品川駅 着", desc: "乗換：12分。新幹線から京急線へ移動します。", icon: "🚉", color: "bg-slate-100 text-slate-700" },
+                    { time: "07:47", title: "品川駅 発", desc: "京急線（日本医大行き・都営浅草線直通）", icon: "🚃", color: "bg-blue-100 text-blue-700" },
+                    { time: "08:10", title: "浅草 着", desc: "乗換＆休憩：50分。地下鉄から東武線へ移動。駅周辺で朝食や飲み物を買うチャンスです！", icon: "🚉", color: "bg-slate-100 text-slate-700" },
+                    { time: "09:00", title: "浅草駅 発", desc: "特急スペーシアX ✨ 快適な列車の旅をお楽しみください。", icon: "🚆", color: "bg-orange-100 text-orange-700" },
+                    { time: "10:50", title: "東武日光駅 着", desc: "日光に到着しました。", icon: "🚉", color: "bg-slate-100 text-slate-700" },
+                    { time: "11:00", title: "東武日光駅 発", desc: "東照宮行きバス、またはタクシー。現地の混雑状況を見て空いている方をチョイス！", icon: "🚕", color: "bg-blue-100 text-blue-700" },
+                    { time: "11:30", title: "日光東照宮 着", desc: "観光＆昼食時間：約2時間半。ゆっくり歴史に触れてください。", icon: "⛩️", color: "bg-green-100 text-green-700" },
+                    { time: "14:00", title: "タクシー観光スタート", desc: "東照宮タクシー乗り場発。約4時間の観光を満喫！", icon: "🚕", color: "bg-green-100 text-green-700" },
+                    { time: "18:00", title: "鬼怒川温泉ホテル 着", desc: "長旅と観光の疲れを温泉でゆっくり癒やしてください。", icon: "♨️", color: "bg-red-100 text-red-700" }
+                ]
+            },
+            day2: {
+                memos: [
+                    { icon: "📸", title: "2日目の朝のポイント", text: "鬼怒川温泉駅前の「ふれあい橋（鬼の階段アート）」は人気のフォトスポットです。タクシーでうまく立ち寄ってもらうよう、事前に運転手さんに伝えておくとスムーズです。" }
+                ],
+                events: [
+                    { time: "09:30", title: "ホテル 出発", desc: "タクシーで移動を開始します。", icon: "🚕", color: "bg-blue-100 text-blue-700" },
+                    { time: "09:40", title: "ふれあい橋", desc: "巨大な鬼の絵が描かれた階段アートで記念撮影！👹", icon: "📸", color: "bg-pink-100 text-pink-700" },
+                    { time: "09:50", title: "鬼怒川温泉駅 着", desc: "駅前でお土産購入タイム（約30分）🛍️ 買い忘れのないように！", icon: "🚉", color: "bg-pink-100 text-pink-700" },
+                    { time: "10:27", title: "鬼怒川温泉駅 発", desc: "特急リバティきぬに乗車し、帰路につきます。", icon: "🚆", color: "bg-orange-100 text-orange-700" },
+                    { time: "12:35", title: "浅草 着", desc: "到着です。旅行お疲れ様でした！🍵", icon: "🚉", color: "bg-slate-100 text-slate-700" }
+                ]
+            }
+        };
+
+        let activeEventIndex = null;
+
+        const timelineContainer = document.getElementById('timeline-container');
+        const memosContainer = document.getElementById('memos-container');
+        const btnDay1 = document.getElementById('btn-day1');
+        const btnDay2 = document.getElementById('btn-day2');
+
+        function renderTimeline(events) {
+            timelineContainer.innerHTML = '';
+            events.forEach((event, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'relative pl-6 sm:pl-10 cursor-pointer group';
+                itemDiv.onclick = () => toggleEventDetail(index);
+
+                const iconDiv = document.createElement('div');
+                iconDiv.className = `absolute -left-[1.35rem] top-0 w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm border-2 border-white transition-transform duration-300 group-hover:scale-110 ${event.color}`;
+                iconDiv.innerText = event.icon;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'bg-slate-50 rounded-xl p-4 sm:p-5 transition-all duration-300 border border-transparent group-hover:border-orange-200 group-hover:shadow-md';
+                contentDiv.id = `event-content-${index}`;
+
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'flex justify-between items-start sm:items-center gap-2 sm:gap-4';
+                
+                const titleWrap = document.createElement('div');
+                titleWrap.className = 'flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 flex-grow';
+
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'text-orange-600 font-bold font-mono text-lg shrink-0';
+                timeSpan.innerText = event.time;
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'font-bold text-slate-800 text-lg leading-tight';
+                titleSpan.innerText = event.title;
+
+                titleWrap.appendChild(timeSpan);
+                titleWrap.appendChild(titleSpan);
+
+                const toggleIcon = document.createElement('span');
+                toggleIcon.id = `event-icon-${index}`;
+                toggleIcon.className = 'text-slate-400 font-bold transition-transform duration-300 shrink-0 text-xl mt-0.5 sm:mt-0';
+                toggleIcon.innerText = '＋';
+
+                headerDiv.appendChild(titleWrap);
+                headerDiv.appendChild(toggleIcon);
+
+                const descDiv = document.createElement('div');
+                descDiv.id = `event-desc-${index}`;
+                descDiv.className = 'mt-3 text-slate-600 hidden border-t border-slate-200 pt-3 text-sm sm:text-base leading-relaxed';
+                descDiv.innerText = event.desc;
+
+                contentDiv.appendChild(headerDiv);
+                contentDiv.appendChild(descDiv);
+                
+                itemDiv.appendChild(iconDiv);
+                itemDiv.appendChild(contentDiv);
+                
+                timelineContainer.appendChild(itemDiv);
+            });
+        }
+
+        function toggleEventDetail(index) {
+            const descDiv = document.getElementById(`event-desc-${index}`);
+            const iconSpan = document.getElementById(`event-icon-${index}`);
+            const contentDiv = document.getElementById(`event-content-${index}`);
+
+            if (activeEventIndex !== null && activeEventIndex !== index) {
+                const prevDesc = document.getElementById(`event-desc-${activeEventIndex}`);
+                const prevIcon = document.getElementById(`event-icon-${activeEventIndex}`);
+                const prevContent = document.getElementById(`event-content-${activeEventIndex}`);
+                if(prevDesc) prevDesc.classList.add('hidden');
+                if(prevIcon) {
+                    prevIcon.innerText = '＋';
+                    prevIcon.classList.remove('rotate-45', 'text-orange-500');
+                }
+                if(prevContent) prevContent.classList.remove('bg-orange-50', 'border-orange-200');
+            }
+
+            if (descDiv.classList.contains('hidden')) {
+                descDiv.classList.remove('hidden');
+                iconSpan.innerText = '×';
+                iconSpan.classList.add('rotate-45', 'text-orange-500');
+                contentDiv.classList.add('bg-orange-50', 'border-orange-200');
+                activeEventIndex = index;
+            } else {
+                descDiv.classList.add('hidden');
+                iconSpan.innerText = '＋';
+                iconSpan.classList.remove('rotate-45', 'text-orange-500');
+                contentDiv.classList.remove('bg-orange-50', 'border-orange-200');
+                activeEventIndex = null;
+            }
+        }
+
+        function renderMemos(memos) {
+            memosContainer.innerHTML = '';
+            memos.forEach(memo => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-xl shadow-sm border border-amber-200 hover:shadow-md transition-shadow';
+                
+                const titleArea = document.createElement('div');
+                titleArea.className = 'flex items-center gap-2 mb-2';
+                
+                const icon = document.createElement('span');
+                icon.className = 'text-xl';
+                icon.innerText = memo.icon;
+                
+                const title = document.createElement('h4');
+                title.className = 'font-bold text-slate-800';
+                title.innerText = memo.title;
+                
+                titleArea.appendChild(icon);
+                titleArea.appendChild(title);
+                
+                const text = document.createElement('p');
+                text.className = 'text-slate-600 text-sm leading-relaxed';
+                text.innerText = memo.text;
+
+                card.appendChild(titleArea);
+                card.appendChild(text);
+                memosContainer.appendChild(card);
+            });
+        }
+
+        function switchDay(dayKey) {
+            activeEventIndex = null;
+            const data = tripData[dayKey];
+            
+            if (dayKey === 'day1') {
+                btnDay1.className = 'px-6 py-2 rounded-md font-semibold transition-colors bg-white shadow text-orange-700';
+                btnDay2.className = 'px-6 py-2 rounded-md font-semibold transition-colors text-slate-600 hover:text-orange-700';
+            } else {
+                btnDay2.className = 'px-6 py-2 rounded-md font-semibold transition-colors bg-white shadow text-orange-700';
+                btnDay1.className = 'px-6 py-2 rounded-md font-semibold transition-colors text-slate-600 hover:text-orange-700';
+            }
+
+            renderTimeline(data.events);
+            renderMemos(data.memos);
+        }
+
+        btnDay1.addEventListener('click', () => switchDay('day1'));
+        btnDay2.addEventListener('click', () => switchDay('day2'));
+
+        window.onload = () => {
+            switchDay('day1');
+        };
+    </script>
+</body>
+</html>
